@@ -26,7 +26,12 @@ questionBank.push(new Question(1,"Which of these is NOT a Spice Girl?",["Dirty S
                   new Question(2,"Which of these is NOT a character in Star Wars?",["Captain Picard","Luke Skywalker","General Grivious","Admiral Ackbar"]),
                   new Question(3,"Which of these countries are not in the European Union?",["Ukraine","Romania","Belgium","Croatia"]),
                   new Question(4,"Which character in Game of Thrones was beheaded?",["Ned Stark","Hodor","John Snow","Tywin Lannister"]),
-                  new Question(5,"Which of these car manufacturers are not from Italy?",["Bugatti","Ferrari","Pagani","Fiat"])
+                  new Question(5,"Which of these car manufacturers are not from Italy?",["Bugatti","Ferrari","Pagani","Fiat"]),
+                  new Question(6,"What was the first model year of the Ford Mustang?",["1964 1/2","1965","1995","1908"]),
+                  new Question(7,"In 'The Hitch Hikers Guide to the Galaxy' what is the answer to Life?",["42","Get'n Paid","Life is but a dream","YES"]),
+                  new Question(8,"Which of these are not Korean brands?",["Huawei","LG","Samsung","Daewoo"]),
+                  new Question(9,"Which song is NOT by the rock band Yeah Yeah Yeahs?",["Antidote","Maps","Heads Will Roll","Hysteric"]),
+                  new Question(10,"Which of these are a Korean dish",["Gim Bop","Maki","Larb","Nan"])
 )
 // console.log(questionBank[4].answers[1]);
 
@@ -35,9 +40,10 @@ var game1 = new Game(0,0,0,0)
 
 // create a new countdown
 var myCounter = new Countdown({  
-    seconds:5,  // number of seconds to count down
+    seconds:10,  // number of seconds to count down
     onUpdateStatus: function(sec){console.log(sec);}, // callback for each second
     onCounterEnd: function(){ 
+        $("#timersection").hide()
         $("#timerremainvalue").html("0")
         game1.numUnanswered+=1
         var correctAnswer = questionBank[game1.qCount].answers[0]
@@ -105,6 +111,7 @@ function Countdown(options) {
 // Function for displaying movie data
 function renderButtons(qNum) {
     $("#gameover").empty()
+    $("#timersection").show()
     myCounter.start()
     // Deletes the buttons prior to adding new ones
     // (this is necessary otherwise you will have repeat buttons)
@@ -211,7 +218,7 @@ function playTheGame() {
     myCounter.stop()
     var selectedAnswer = $(this).attr("data-name");
     var correctAnswer = questionBank[game1.qCount].answers[0]
-
+    $("#timersection").hide()
     if(selectedAnswer === "0"){
         $("#answers-view").html("<h2>Correctamundo!</h2>")
         game1.numCorrect+=1
@@ -230,7 +237,7 @@ function playTheGame() {
         else{
             gameOver()
         }
-    }, 3000)//wait 5 seconds then move on
+    }, 3000)//wait 3 seconds then move on
 
     
 
