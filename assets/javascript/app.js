@@ -9,13 +9,16 @@ $(document).ready(function(){
     }
 
 
-    function Game(qCount, numCorrect, numWrong){
-        this.qCount = qCount
-        this.numCorrect = numCorrect
-        this.numWrong = numWrong
+    function Game(qCount, numCorrect, numWrong, numUnanswered){
+        this.qCount = qCount//counter for current question
+        this.numCorrect = numCorrect//number of correct guesses
+        this.numWrong = numWrong// number of incorrect guesses
+        this.numUnanswered = numUnanswered
     }
 
-var game1 = new Game(0,0,0)
+//hide the timer
+    $("#timersection").hide()
+
 
 var questionBank = [];
 
@@ -28,18 +31,41 @@ questionBank.push(new Question(1,"Which of these is NOT a Spice Girl?",["Dirty S
 // console.log(questionBank[4].answers[1]);
 
 
+var game1 = new Game(0,0,0,0)
 
+// create a new countdown
 var myCounter = new Countdown({  
     seconds:5,  // number of seconds to count down
     onUpdateStatus: function(sec){console.log(sec);}, // callback for each second
     onCounterEnd: function(){ 
         $("#timerremainvalue").html("0")
-        alert('game over!');
+        game1.numUnanswered+=1
+        var correctAnswer = questionBank[game1.qCount].answers[0]
+        $("#answers-view").html("<h2>TIME IS UP!!!</h2>")
+        $("#answers-view").append("<h2>The answer was: "+ correctAnswer +"</h2>")
+        console.log("unanswered count", game1.numUnanswered)
+        console.log("timeout qCount: ", game1.qCount)
+        //go to next question
+            game1.qCount+=1
+            setTimeout(function(){ 
+                if(game1.qCount < questionBank.length){
+                    myCounter.start()
+                    renderButtons(game1.qCount)
+                }
+                else{
+                    gameOver()
+                }
+
+            }, 3000);
+                
+            
+
+        
     
     } // final action
 });
 
-
+//countdown timer
 function Countdown(options) {
   var timer,
   instance = this,
@@ -50,12 +76,13 @@ function Countdown(options) {
   function decrementCounter() {
     updateStatus(seconds);
     if (seconds === 0) {
+        console.log("hey seconds are ZERO")
       counterEnd();
       instance.stop();
     }
     else{
-        seconds--;
         $("#timerremainvalue").html(seconds)
+        seconds--;
         console.log(seconds)  
     }
  
@@ -65,6 +92,7 @@ function Countdown(options) {
     clearInterval(timer);
     timer = 0;
     seconds = options.seconds;
+    console.log("countdown.start was called-seconds:",seconds)
     timer = setInterval(decrementCounter, 1000);
   };
 
@@ -74,40 +102,13 @@ function Countdown(options) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-// create a countdown timer
-// function countdown(timeLeft,timerID) {
-
-   
-
-
-//   if (timeLeft === 0) {
-//     alert("game over!")
-//     $("#timerremainvalue").html("0")  
-//     clearInterval(timerId);
-//   } else {
-//     $("#timerremainvalue").html(timeLeft)
-//     console.log(timeLeft)
-//     timeLeft--;
-//   }
-// }
-
-
 // Function for displaying movie data
 function renderButtons(qNum) {
-
+    $("#gameover").empty()
+    myCounter.start()
     // Deletes the buttons prior to adding new ones
     // (this is necessary otherwise you will have repeat buttons)
-    $("#answers-view").empty();
+    $("#answers-view").empty()
 
     // Loops through the array of movies
     
@@ -117,28 +118,30 @@ function renderButtons(qNum) {
         
       // Then dynamicaly generates buttons for each movie in the array
       // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
-      var a = $("<button>");
+      var a = $("<button>")
       // Adds a class of movie to our button
-      a.addClass("trivia");
+      a.addClass("trivia")
       // Added a data-attribute
-      a.attr("data-name", i);
+      a.attr("data-name", i)
 
       
       // Provided the initial button text
-      a.text(questionBank[qNum].answers[i]);
+      a.text(questionBank[qNum].answers[i])
       // Added the button to the buttons-view div
       
 
       var random_boolean = Math.random() >= 0.5;
       console.log(random_boolean)
       if(random_boolean===true){//lets randomize the button order
-        $("#answers-view").append(a);
+        $("#answers-view").append(a)
       }
       else{
-        $("#answers-view").prepend(a);
+        $("#answers-view").prepend(a)
       }
     
     }
+
+    
   }
 
 
@@ -147,17 +150,100 @@ function renderButtons(qNum) {
     // This function handles start of the game when start button is clicked
     $(".startbtn").on("click", function(event) {
         event.preventDefault();
+        $("#timersection").show()
         var qMax = questionBank.length
         console.log("max questions",qMax)
         renderButtons(game1.qCount)
         console.log("current question:",game1.qCount)
-        game1.qCount+=1
+        //game1.qCount+=1
+        console.log("startbutton qCount:",game1.qCount)
         $(".startbtn").hide()
-        myCounter.start();
+     
 
       });
 
 
 
+function gameOver(){
+    //tell player he sucks and his score
+
+    //then spawn a reset button
+
+    var a = $("<button>")
+    // Adds a class of reset to our button
+    a.addClass("reset")
+    // Added a data-attribute
+    a.attr("data-name", "reset")
+
+    
+    // Provided the button text
+    a.text("RESET")
+
+    var tallyCorrect = "<h3>Correct Answers:&nbsp;" + game1.numCorrect + "</h3>"
+    var tallyWrong = "<h3>Wrong Answers:&nbsp;" + game1.numWrong + "</h3>"
+    var tallyUnanswered = "<h3>Unanswered:&nbsp;" + game1.numUnanswered + "</h3>"
+
+    $("#resetholder").html(a)
+    $("#gameover").html("<h3>All done, here is how you did!!</h3>")
+    $("#gameover").append(tallyCorrect)
+    $("#gameover").append(tallyWrong)
+    $("#gameover").append(tallyUnanswered)
+    $("#answers-view").html("")
+    $("#theBigQ").html("")
+    $("#timersection").hide()
+
+}
+
+
+function resetMeYo(){
+    //reset
+
+    game1 = new Game(0,0,0,0)
+    $("#resetholder").html("")
+    $("#gameover").html("")
+    $(".startbtn").show()
+
+
+}
+
+
+function playTheGame() {
+    myCounter.stop()
+    var selectedAnswer = $(this).attr("data-name");
+    var correctAnswer = questionBank[game1.qCount].answers[0]
+
+    if(selectedAnswer === "0"){
+        $("#answers-view").html("<h2>Correctamundo!</h2>")
+        game1.numCorrect+=1
+    }
+    else{
+        $("#answers-view").html("<h2>WRONG!!!</h2>")
+        $("#answers-view").append("<h2>The answer was: "+ correctAnswer +"</h2>")
+        game1.numWrong+=1
+    }
+    
+    game1.qCount+=1//increment to next question
+    setTimeout(function(){ 
+        if(game1.qCount < questionBank.length){
+            renderButtons(game1.qCount)
+        }
+        else{
+            gameOver()
+        }
+    }, 3000)//wait 5 seconds then move on
+
+    
+
+    console.log("selectedAnswer:",selectedAnswer)
+
+
+  }
+
+
+
+      // Adding click event listeners to all elements with a class of "trivia"
+      $(document).on("click", ".trivia", playTheGame);
+      // Adding click event listeners to reset the game on button press
+      $(document).on("click", ".reset", resetMeYo);
 
 })

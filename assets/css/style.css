@@ -68,3 +68,20 @@ h1{
     margin:0 auto;
     text-align:center;
 }
+
+.reset{
+    margin-top:20px;
+    margin-left:10px;
+    margin-right:10px;
+}
+
+#resetholder{
+    text-align:center;
+    margin:0 auto;
+}
+
+#gameover{
+    text-align:center;
+    margin:0 auto;
+    margin-top:20px;
+}
